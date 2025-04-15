@@ -10,13 +10,10 @@ use Yiisoft\Injector\Injector;
 final readonly class GeneratorCollection
 {
     private const array DEFAULT_GENERATORS = [
-        'php' => 'Botasis\Telegram\Scraper\Generator\PhpGenerator',
-        'openapi' => [
-            'class' => 'Botasis\Telegram\Scraper\Generator\OpenApiGenerator',
-            'factory' => 'Botasis\Telegram\Scraper\Generator\OpenApiGeneratorFactory',
-        ],
+        /* 'php' => \Botasis\Telegram\Scraper\Generator\PhpGenerator::class,
+        'php2' => \Botasis\Telegram\Scraper\Generator\PhpGeneratorFactory::class,
         'foo' => new FooGenerator(),
-        'bar' => new BarGeneratorFactory(),
+        'bar' => new BarGeneratorFactory(), */
     ];
 
     /**
@@ -35,33 +32,17 @@ final readonly class GeneratorCollection
 
         $generators = [];
         foreach ($definitions as $name => $definition) {
-            if ($definition instanceof Generator) {
-                $generators[$name] = new GeneratorDefinition(
+            $generators[$name] = match (true) {
+                $definition instanceof Generator || is_subclass_of($definition, Generator::class) => new GeneratorDefinition(
                     new DefaultGeneratorFactory($injector, $definition),
                     [],
-                    [],
-                );
-            } elseif ($definition instanceof GeneratorFactory) {
-                $generators[$name] = new GeneratorDefinition(
+                ),
+                $definition instanceof GeneratorFactory || is_subclass_of($definition, GeneratorFactory::class) => new GeneratorDefinition(
                     $definition,
                     [],
-                    [],
-                );
-            } elseif (is_subclass_of($definition, Generator::class)) {
-                $generators[$name] = new GeneratorDefinition(
-                    new DefaultGeneratorFactory($injector, $definition),
-                    [],
-                    [],
-                );
-            } elseif (is_subclass_of($definition, GeneratorFactory::class)) {
-                $generators[$name] = new GeneratorDefinition(
-                    new DefaultGeneratorFactory($injector, $definition),
-                    [],
-                    [],
-                );
-            } else {
-                throw new \InvalidArgumentException('Invalid generator definition: ' . $definition);
-            }
+                ),
+                default => throw new \InvalidArgumentException('Invalid generator definition: ' . $definition),
+            };
         }
 
         $this->generators = $generators;

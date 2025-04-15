@@ -14,7 +14,7 @@ final readonly class GeneratorDefinition
 
     public function getParameters(): array
     {
-        return $this->parameters;
+        return $this->generator->getParameters();
     }
 
     public function getGenerator(array $parameters): Generator

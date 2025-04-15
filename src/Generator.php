@@ -6,6 +6,9 @@ namespace Botasis\Telegram\Scraper;
 
 use Botasis\Telegram\Scraper\Schema;
 
+/**
+ * Generator converts Telegram schema to files of a specific format
+ */
 interface Generator
 {
     /**

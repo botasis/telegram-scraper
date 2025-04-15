@@ -19,4 +19,9 @@ final readonly class DefaultGeneratorFactory implements GeneratorFactory
 
         return $this->injector->make($this->generator, $options);
     }
+
+    public function getParameters(): array
+    {
+        return [];
+    }
 }
