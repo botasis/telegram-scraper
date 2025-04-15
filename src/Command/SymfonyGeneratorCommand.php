@@ -3,8 +3,7 @@ declare(strict_types=1);
 
 namespace Botasis\Telegram\Scraper\Command;
 
-use Botasis\Telegram\Scraper\GeneratorDefinition;
-use Botasis\Telegram\Scraper\Schema;
+use Botasis\Telegram\Scraper\GeneratorFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -13,9 +12,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class SymfonyGeneratorCommand extends Command
 {
-    private GeneratorDefinition $generator;
+    private GeneratorFactory $generator;
 
-    public function __construct(string $name, GeneratorDefinition $generator)
+    public function __construct(string $name, GeneratorFactory $generator)
     {
         parent::__construct($name);
         $this->generator = $generator;
@@ -39,8 +38,7 @@ final class SymfonyGeneratorCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // Get the actual generator instance
-        $generator = $this->generator->getGenerator();
-        $generator->
+        $generator = $this->generator->create($input->getOptions());
         
         // Load schema and generate
         /** 

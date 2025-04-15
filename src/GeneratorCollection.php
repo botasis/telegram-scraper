@@ -33,14 +33,10 @@ final readonly class GeneratorCollection
         $generators = [];
         foreach ($definitions as $name => $definition) {
             $generators[$name] = match (true) {
-                $definition instanceof Generator || is_subclass_of($definition, Generator::class) => new GeneratorDefinition(
-                    new DefaultGeneratorFactory($injector, $definition),
-                    [],
-                ),
-                $definition instanceof GeneratorFactory || is_subclass_of($definition, GeneratorFactory::class) => new GeneratorDefinition(
-                    $definition,
-                    [],
-                ),
+                $definition instanceof Generator => new DefaultGeneratorFactory($injector, $definition),
+                $definition instanceof GeneratorFactory => $definition,
+                is_subclass_of($definition, Generator::class) => new DefaultGeneratorFactory($injector, $injector->make($definition)),
+                is_subclass_of($definition, GeneratorFactory::class) => $injector->make($definition),
                 default => throw new \InvalidArgumentException('Invalid generator definition: ' . $definition),
             };
         }
@@ -48,10 +44,14 @@ final readonly class GeneratorCollection
         $this->generators = $generators;
     }
 
-    public function getGenerator(string $name): ?GeneratorDefinition {
+    public function getGenerator(string $name): ?GeneratorFactory {
         return $this->generators[$name] ?? null;
     }
 
+    /**
+     * Returns all available generators
+     * @return array<string, GeneratorFactory> 
+     */
     public function getGenerators(): array {
         return $this->generators;
     }
